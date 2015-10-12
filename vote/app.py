@@ -4,6 +4,7 @@ import os
 import retrying
 import logging
 import gevent.wsgi
+import json
 
 from vote import queue
 from vote.signals import app_start
@@ -44,9 +45,9 @@ def place_vote():
     if request.method == 'POST':
         team = request.form['vote']
 
-        logging.warning('WTF...')
         # Post a message with the team being voted for.
-        current_app.extensions['rabbit_queue'].queue_message(team)
+        message = json.dumps({'team': team})
+        current_app.extensions['rabbit_queue'].queue_message(message)
 
         # Rendering the output for index.
         return render_template(
@@ -86,7 +87,7 @@ def create_teams():
     Helper method to create teams.
     """
     for x in range(1, 15):
-        TEAMS_COMPETING.append('Team: {}'.format(x))
+        TEAMS_COMPETING.append('{}'.format(x))
 
 
 def run_app(app):

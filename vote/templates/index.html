@@ -7,7 +7,9 @@
   			<br />
   			<form action="/" method="POST">
           {% for team in teams_competing %}
-              <input type="submit" class="btn btn-lg btn-info" name="vote" value="{{ team }}">
+              <button type="submit" class="btn btn-lg btn-info" name="vote" value="{{ team }}">
+                Team: {{ team }} 
+              </button>
           {% endfor %}  
   			</form> 
   		</div>
