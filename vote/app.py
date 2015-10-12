@@ -1,13 +1,38 @@
-from flask import Flask, render_template, request, Blueprint, current_app
+from flask import Flask, render_template, request, current_app
 import argparse
 import os
 import retrying
+import logging
+import gevent.wsgi
 
 from vote import queue
+from vote.signals import app_start
 
 app = Flask(__name__)
 
 TEAMS_COMPETING = []
+
+
+def init_app(app):
+    """
+    Initialize the rabbitmq extension.
+    """
+    rabbit_queue = queue.Queue()
+    app.extensions['rabbit_queue'] = rabbit_queue
+
+
+# Template for starting multiple extensions.
+@app_start.connect
+def start_producers(app, **kwargs):
+    producers = [
+        app.extensions.get('rabbit_queue')  # ,
+        # Add redis extension here
+    ]
+
+    for producer in producers:
+        if producer:
+            producer.run_queue()
+
 
 @app.route('/', methods=['GET', 'POST'])
 def place_vote():
@@ -19,12 +44,11 @@ def place_vote():
     if request.method == 'POST':
         team = request.form['vote']
 
-        # post a message with the team being voted for.
-        rabbit_queue = queue.Queue()
-        rabbit_queue.run()
-        rabbit_queue.queue_message(team)
+        logging.warning('WTF...')
+        # Post a message with the team being voted for.
+        current_app.extensions['rabbit_queue'].queue_message(team)
 
-        # Rendering the output for index
+        # Rendering the output for index.
         return render_template(
             'index.html',
             last_vote=team,
@@ -34,16 +58,6 @@ def place_vote():
     else:
         return render_template('index.html',
             teams_competing=TEAMS_COMPETING)
-
-
-# from . import redis_handler
-
-# test = redis_handler.RedisHandler()
-# print test.REDIS_HOST
-# redis_session = test.create_session()
-
-# test.create_teams(redis_session, 10)
-
 
 @app.route('/votes')
 def votes():
@@ -67,45 +81,28 @@ def votes():
     )
 
 
-#@blueprint.route('/vote/<int:team_vote>', methods=['PUT'])
-def api_vote(team_vote):
-    """
-    Api to allow teams to post votes.
-    """
-    print "WE DID STUFF!!!"
-    current_vote_count = redis_server.get(team)
-    if current_vote_count is None:
-        current_vote_count = int(1)
-    else:
-        current_vote_count = int(current_vote_count) + 1
-        redis_server.set(team, current_vote_count)
-
 def create_teams():
     """
     Helper method to create teams.
     """
-    for x in range(1, 10):
+    for x in range(1, 15):
         TEAMS_COMPETING.append('Team: {}'.format(x))
 
-def create_queue():
-    """
-    Helper method to create and instantiate a queue object.
-    """
-    rabbit_queue = queue.Queue()
-    rabbit_queue.run()
-    return queue
 
-def init_app(app):
-    rabbit_queue = create_queue()
-    app.extension['queue'] = rabbit_queue
-    return app
+def run_app(app):
+    init_app(app)
+    app_start.send(app)
+
+    try:
+        logging.warning('starting the web service')
+        ws = gevent.wsgi.WSGIServer(('0.0.0.0', int(5000)), app)
+        ws.serve_forever()
+        logging.warning('that didnt block')
+
+    finally:
+        logging.info('change this later')
 
 if __name__ == "__main__":
     app.debug = True
-    # create_teams()
-    # app = init_app(app)
-    rabbit_queue = queue.Queue()
-    rabbit_queue.run()
-    rabbit_queue.queue_message('test_message')
-    app.run()
-
+    create_teams()
+    run_app(app)
