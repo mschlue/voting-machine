@@ -1,0 +1,59 @@
+{% extends "layout.html" %}
+<HTML>
+
+  {% block head %}
+    <!--Load the AJAX API-->
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+
+      // Load the Visualization API and the piechart package.
+      google.load('visualization', '1.0', {'packages':['corechart']});
+
+      // Set a callback to run when the Google Visualization API is loaded.
+      google.setOnLoadCallback(drawChart);
+
+      // Callback that creates and populates a data table,
+      // instantiates the pie chart, passes in the data and
+      // draws it.
+      function drawChart() {
+
+        // Create the data table.
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Teams');
+        data.addColumn('number', 'Votes');
+        data.addRows([
+          ['Team 1', {{ team_votes_total['team1'] }}],
+          ['Team 2', {{ team_votes_total['team2'] }}],
+          ['Team 3', {{ team_votes_total['team3'] }}],
+          ['Team 4', {{ team_votes_total['team4'] }}],
+          ['Team 5', {{ team_votes_total['team5'] }}],
+          ['Team 6', {{ team_votes_total['team6'] }}]
+        ]);
+
+        // Set chart options
+        var options = {'title':'Votes Cast',
+                       'width':800,
+                       'is3D':true,
+                       'height':600};
+
+        // Instantiate and draw our chart, passing in some options.
+        var chart = new google.visualization.ColumnChart(document.getElementById('chart_div')); 
+        chart.draw(data, options);
+      }
+    </script>
+  {% endblock %} 
+
+  {% block body %}
+          <!-- 
+          Team 1: {{ team_votes_total['team1'] }}  <br />
+          Team 2: {{ team_votes_total['team2'] }}  <br />
+          Team 3: {{ team_votes_total['team3'] }}  <br />
+          Team 4: {{ team_votes_total['team4'] }}  <br />
+          Team 5: {{ team_votes_total['team5'] }}  <br />
+          Team 6: {{ team_votes_total['team6'] }}  <br />
+          -->
+          <a href="/">INDEX</a>
+
+    <!--Div that will hold the pie chart-->
+    <div id="chart_div"></div>
+  {% endblock %}

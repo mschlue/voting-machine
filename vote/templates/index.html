@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+  {% block body %}
+    <div align="center" class="container marketing">
+  	 	<div class="row">
+
+  			<h3>Click your team to the top:</h3>
+  			<br />
+  			<form action="/" method="POST">
+          {% for team in teams_competing %}
+              <input type="submit" class="btn btn-lg btn-info" name="vote" value="{{ team }}">
+          {% endfor %}  
+  			</form> 
+  		</div>
+
+      </div>
+
+      <a href="/votes">RESULTS</a>
+  {% endblock %}

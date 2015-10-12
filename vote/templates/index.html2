@@ -1,0 +1,9 @@
+
+read it out! <br />
+{{ test }} <br />
+{{ test2 }}
+<br />
+<form action="/" method="POST">
+	<input type="submit" name="vote" value="YES">
+	<input type="submit" name="vote" value="NO">
+</form>
