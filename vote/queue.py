@@ -19,7 +19,7 @@ class Queue(object):
         self.create_connection()
 
 
-    def run_queue(self):
+    def start(self):
         """
         Start the queue service running.
         """
@@ -68,7 +68,3 @@ class Queue(object):
         for message in self.queue:
             logging.warning("calling publish_message")
             self.publish_message(message)
-
-
-
-

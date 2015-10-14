@@ -1,12 +1,9 @@
 from flask import Flask, render_template, request, current_app
-import argparse
-import os
-import retrying
 import logging
 import gevent.wsgi
 import json
 
-from vote import queue
+from vote import queue, redis_handler
 from vote.signals import app_start
 
 app = Flask(__name__)
@@ -19,20 +16,23 @@ def init_app(app):
     Initialize the rabbitmq extension.
     """
     rabbit_queue = queue.Queue()
+    r_handler = redis_handler.RedisHandler()
+
     app.extensions['rabbit_queue'] = rabbit_queue
+    app.extensions['r_handler'] = r_handler
 
 
 # Template for starting multiple extensions.
 @app_start.connect
 def start_producers(app, **kwargs):
     producers = [
-        app.extensions.get('rabbit_queue')  # ,
-        # Add redis extension here
+        app.extensions.get('rabbit_queue'),
+        app.extensions.get('r_handler')
     ]
 
     for producer in producers:
         if producer:
-            producer.run_queue()
+            producer.start()
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -60,6 +60,7 @@ def place_vote():
         return render_template('index.html',
             teams_competing=TEAMS_COMPETING)
 
+
 @app.route('/votes')
 def votes():
     """
@@ -67,19 +68,12 @@ def votes():
 
     :return: rendered template of the voting results
     """
-    temp = redis_server.keys(pattern='*')
-    for t in temp:
-        print "KEY: " + t + " Value: " + str(redis_server.get(t))
+    vote_total = {}
+    for team in TEAMS_COMPETING:
+        team = 'team{}'.format(team)
+        vote_total[team] = current_app.extensions['r_handler'].get_key(team)
 
-    team_keys = redis_server.keys(pattern='*')
-
-    team_votes_total = {}
-    for key in team_keys:
-        team_votes_total[key] = redis_server.get(key)
-
-    return render_template("results.html",
-        team_votes_total = team_votes_total
-    )
+    return render_template('results.html', team_votes_total=vote_total)
 
 
 def create_teams():
@@ -98,7 +92,6 @@ def run_app(app):
         logging.warning('starting the web service')
         ws = gevent.wsgi.WSGIServer(('0.0.0.0', int(5000)), app)
         ws.serve_forever()
-        logging.warning('that didnt block')
 
     finally:
         logging.info('change this later')
