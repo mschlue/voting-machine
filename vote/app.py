@@ -96,7 +96,7 @@ def run_app(app):
     finally:
         logging.info('change this later')
 
-if __name__ == "__main__":
+def main():
     app.debug = True
     create_teams()
     run_app(app)

@@ -16,3 +16,11 @@ using sane default values to enable local development.
 * REDIS_HOST - [default: localhost] Hostname of the redis server.
 * REDIS_PORT - [default: 6379] The port number redis is hosted on.
 * REDIS_DB - [default: 0] Which database to use inside redis.
+
+
+### Developing locally
+* Create a new python virtual envrionment
+* Install the necessary requirements `pip install -r requirements.txt`
+* run the application by calling the entrypoint script `voting-web`
+Note: For more effective local dev experience, start a rabbitmq and redis server
+locally with default configuration options

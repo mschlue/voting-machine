@@ -33,7 +33,7 @@ setup_args = dict(
     tests_require=get_test_requires(),
     entry_points={
         'console_scripts': [
-            'voting-web=vote.scripts.web:main',
+            'voting-web=vote.app:main',
         ]
     },
 )

@@ -1,0 +1,10 @@
+cover
+.coverage
+*.egg-info
+*.pyc
+*.swp
+*.vagrant
+.DS_Store
+nosetests.xml
+coverage.xml
+dist
