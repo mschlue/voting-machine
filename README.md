@@ -21,6 +21,7 @@ using sane default values to enable local development.
 ### Developing locally
 * Create a new python virtual envrionment
 * Install the necessary requirements `pip install -r requirements.txt`
-* run the application by calling the entrypoint script `voting-web`
+* From the top level directory, install the application with `pip install -e .`
+* Run the application by calling the entrypoint script `voting-web`
 Note: For more effective local dev experience, start a rabbitmq and redis server
 locally with default configuration options

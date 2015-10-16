@@ -29,12 +29,17 @@ setup_args = dict(
     version='0.1.0',
     packages=find_packages(),
     namespace_packages=['vote'],
+    include_package_data=True,
     install_requires=get_install_requires(),
     tests_require=get_test_requires(),
     entry_points={
         'console_scripts': [
-            'voting-web=vote.app:main',
+            'voting-web=vote.web:main',
         ]
+    },
+    package_data={
+        'static': 'vote/web/static/*',
+        'templates': 'vote/web/templates/*',
     },
 )
 

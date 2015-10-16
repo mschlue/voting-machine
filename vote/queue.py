@@ -25,7 +25,7 @@ class Queue(object):
         """
         greenlets = []
         try:
-            logging.warning("starting publish greenlet")
+            logging.debug("starting publish greenlet")
             greenlets.append(gevent.spawn(self.publish_loop))
         except:
             logging.exception("unexpected greenlet exit")
@@ -54,7 +54,7 @@ class Queue(object):
         """
         Publish a single message to rabbitmq.
         """
-        logging.warning("throwing message on teh queue.")
+        logging.debug("throwing message on the queue.")
         publish = self.connection.ensure(self.producer,
                                          self.producer.publish,
                                          max_retries=3)
@@ -64,7 +64,7 @@ class Queue(object):
         """
         Listen to the Gevent queue and publish messages.
         """
-        logging.warning('starting push loop, waiting for events.')
+        logging.warning('starting queue, waiting for events.')
         for message in self.queue:
             logging.warning("calling publish_message")
             self.publish_message(message)
