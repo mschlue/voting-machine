@@ -6,7 +6,9 @@ import json
 from vote import queue, redis_handler
 from vote.signals import app_start
 
-app = Flask(__name__)
+app = Flask(__name__, instance_path='/voting_wars/vote/web/')
+
+logging.warning('flask root path {}'.format(app.instance_path))
 
 TEAMS_COMPETING = []
 
@@ -22,17 +24,19 @@ def init_app(app):
     app.extensions['r_handler'] = r_handler
 
 
-# Template for starting multiple extensions.
 @app_start.connect
-def start_producers(app, **kwargs):
-    producers = [
+def start_extensions(app, **kwargs):
+    """
+    Start redis and rabbitmq at app startup
+    """
+    extensions = [
         app.extensions.get('rabbit_queue'),
         app.extensions.get('r_handler')
     ]
 
-    for producer in producers:
-        if producer:
-            producer.start()
+    for extension in extensions:
+        if extension:
+            extension.start()
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -89,7 +93,7 @@ def run_app(app):
     app_start.send(app)
 
     try:
-        logging.warning('starting the web service')
+        logging.warning('starting web service')
         ws = gevent.wsgi.WSGIServer(('0.0.0.0', int(5000)), app)
         ws.serve_forever()
 
