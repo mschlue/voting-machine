@@ -6,9 +6,7 @@ import json
 from vote import queue, redis_handler
 from vote.signals import app_start
 
-app = Flask(__name__, instance_path='/voting_wars/vote/web/')
-
-logging.warning('flask root path {}'.format(app.instance_path))
+app = Flask(__name__, instance_path='/voting-machine/vote/web/')
 
 TEAMS_COMPETING = []
 
@@ -59,7 +57,7 @@ def place_vote():
     """
     Main page,
     :return: rendering a page with the status message of the vote for POST
-    :return: rendering the default voting wars page for GET requests
+    :return: rendering the default voting page for GET requests
     """
     vote_total = votes()
     if request.method == 'POST':

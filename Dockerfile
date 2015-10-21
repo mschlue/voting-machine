@@ -5,9 +5,9 @@ RUN apt-get update && apt-get install -y \
     python-dev \
     python-pip 
 
-RUN pip install pip==7.1.2
+# Version of pip used by shipyard
+# RUN pip install pip==7.1.2
 
-RUN mkdir /voting-maching
 ADD . /voting-machine/
 
 WORKDIR /voting-machine/
