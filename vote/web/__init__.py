@@ -47,7 +47,8 @@ def votes():
     for team in range(1, 5):
         team = 'team{}'.format(team)
         vote_total[team] = current_app.extensions['r_handler'].get_key(team)
-        print vote_total[team]
+        if vote_total[team] is None:
+            vote_total[team] = 0
 
     return vote_total
 
