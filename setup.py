@@ -25,7 +25,7 @@ def get_test_requires():
 
 
 setup_args = dict(
-    name='voting_wars',
+    name='voting-machine',
     version='0.1.0',
     packages=find_packages(),
     namespace_packages=['vote'],

@@ -7,11 +7,11 @@ RUN apt-get update && apt-get install -y \
 
 RUN pip install pip==7.1.2
 
-RUN mkdir /voting_wars
-ADD . /voting_wars/
+RUN mkdir /voting-maching
+ADD . /voting-machine/
 
-WORKDIR /voting_wars/
+WORKDIR /voting-machine/
 
-RUN pip install dist/voting_wars-*
+RUN pip install dist/voting-machine-0.1.0.tar.gz
 
 CMD voting-web

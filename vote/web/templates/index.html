@@ -1,19 +1,74 @@
 {% extends "layout.html" %}
+  {% block head %}
+    <!--Load the AJAX API-->
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+
+      // Load the Visualization API and the piechart package.
+      google.load('visualization', '1.0', {'packages':['corechart']});
+
+      // Set a callback to run when the Google Visualization API is loaded.
+      google.setOnLoadCallback(drawChart);
+
+      // Callback that creates and populates a data table,
+      // instantiates the pie chart, passes in the data and
+      // draws it.
+      function drawChart() {
+
+        // Create the data table.
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Teams');
+        data.addColumn('number', 'Votes');
+        data.addRows([
+          ['Bernie', {{ team_votes_total['team1'] }}],
+          ['Hilary', {{ team_votes_total['team2'] }}],
+          ['Trump', {{ team_votes_total['team3'] }}],
+          ['Carson', {{ team_votes_total['team4'] }}]
+        ]);
+
+        // Set chart options
+        var options = {'title':'Votes Cast',
+                       'width':600,
+                       'is3D':true,
+                       'height':400};
+
+        // Instantiate and draw our chart, passing in some options.
+        var chart = new google.visualization.ColumnChart(document.getElementById('chart_div')); 
+        chart.draw(data, options);
+      }
+    </script>
+  {% endblock %} 
+
   {% block body %}
     <div align="center" class="container marketing">
   	 	<div class="row">
 
-  			<h3>Click your team to the top:</h3>
+  			<h3>Click your candidate to the top:</h3>
   			<br />
   			<form action="/" method="POST">
-          {% for team in teams_competing %}
-              <button type="submit" class="btn btn-lg btn-info" name="vote" value="{{ team }}">
-                Team: {{ team }} 
+          <div class="col-md-3">         
+              <button type="submit" class="btn btn-lg btn-default" name="vote" value="team1">
+                <img src="/static/pics/bernie.jpg" width="150" height="200" class="img-rounded"> 
               </button>
-          {% endfor %}  
+          </div>
+          <div class="col-md-3">        
+              <button type="submit" class="btn btn-lg btn-default" name="vote" value="team2">
+                <img src="/static/pics/hilary.jpg" width="150" height="200" class="img-rounded"> 
+              </button>
+          </div>
+          <div class="col-md-3">
+              <button type="submit" class="btn btn-lg btn-default" name="vote" value="team3">
+                <img src="/static/pics/trump.jpg" width="150" height="200" class="img-rounded"> 
+              </button>
+          </div>
+          <div class="col-md-3">          
+              <button type="submit" class="btn btn-lg btn-default" name="vote" value="team4">
+                <img src="/static/pics/carson.jpg" width="150" height="200" class="img-rounded"> 
+              </button>
+          </div>
   			</form> 
   		</div>
-
+        <div id="chart_div"></div>
       </div>
 
       <a href="/votes">RESULTS</a>

@@ -39,6 +39,21 @@ def start_extensions(app, **kwargs):
             extension.start()
 
 
+def votes():
+    """
+    app route to show the results of voting
+
+    :return: rendered template of the voting results
+    """
+    vote_total = {}
+    for team in range(1, 5):
+        team = 'team{}'.format(team)
+        vote_total[team] = current_app.extensions['r_handler'].get_key(team)
+        print vote_total[team]
+
+    return vote_total
+
+
 @app.route('/', methods=['GET', 'POST'])
 def place_vote():
     """
@@ -46,6 +61,7 @@ def place_vote():
     :return: rendering a page with the status message of the vote for POST
     :return: rendering the default voting wars page for GET requests
     """
+    vote_total = votes()
     if request.method == 'POST':
         team = request.form['vote']
 
@@ -57,34 +73,21 @@ def place_vote():
         return render_template(
             'index.html',
             last_vote=team,
-            teams_competing=TEAMS_COMPETING
+            teams_competing=TEAMS_COMPETING,
+            team_votes_total=vote_total,
         )
 
     else:
         return render_template('index.html',
-            teams_competing=TEAMS_COMPETING)
-
-
-@app.route('/votes')
-def votes():
-    """
-    app route to show the results of voting
-
-    :return: rendered template of the voting results
-    """
-    vote_total = {}
-    for team in TEAMS_COMPETING:
-        team = 'team{}'.format(team)
-        vote_total[team] = current_app.extensions['r_handler'].get_key(team)
-
-    return render_template('results.html', team_votes_total=vote_total)
+            teams_competing=TEAMS_COMPETING,
+            team_votes_total=vote_total)
 
 
 def create_teams():
     """
     Helper method to create teams.
     """
-    for x in range(1, 15):
+    for x in range(1, 4):
         TEAMS_COMPETING.append('{}'.format(x))
 
 
